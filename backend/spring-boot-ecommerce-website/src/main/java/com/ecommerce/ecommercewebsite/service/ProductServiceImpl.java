@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
 
@@ -23,12 +23,22 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    public List<Product> getProductsByCategory(String category_name) {
+        Optional<List<Product>> productsByCategory = Optional.ofNullable(productRepository.getProductsByCategory(category_name));
+        if(productsByCategory.isPresent()) {
+            return productRepository.getProductsByCategory(category_name);
+        } else {
+            throw new ResourceNotFoundException("Category with name: " + category_name + " does not exist");
+        }
+    }
+
+    @Override
     public Product getProductById(Long id) {
         Optional<Product> product = Optional.ofNullable(productRepository.getProductById(id));
 		if(product.isPresent()) {
 			return productRepository.getProductById(id);
 		} else {
-			throw new ResourceNotFoundException("Employee with id: " + id + " does not exist");
+			throw new ResourceNotFoundException("Product with id: " + id + " does not exist");
 		}
     }
 

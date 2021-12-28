@@ -2,7 +2,6 @@ package com.ecommerce.ecommercewebsite.controller;
 
 import com.ecommerce.ecommercewebsite.entity.Product;
 import com.ecommerce.ecommercewebsite.service.ProductService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +22,14 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    @GetMapping("/category/{category_name}")
+    public List<Product> getProductsByCategory(@PathVariable String category_name) {
+        return productService.getProductsByCategory(category_name);
+    }
+
     @GetMapping("{id}")
     public Product getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
-        return product;
+        return productService.getProductById(id);
     }
+
 }
