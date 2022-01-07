@@ -18,8 +18,6 @@ public class Product {
     @Column(name = "id")
     private Long id;
 
-    //@ManyToOne
-    //@JoinColumn(name = "category_id", nullable = false)
     @Column(name = "category_id")
     private int category;
 

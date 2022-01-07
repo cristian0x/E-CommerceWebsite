@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query(value = "SELECT * FROM product", nativeQuery = true)
+    @Query(value = "SELECT * FROM product LIMIT 10", nativeQuery = true)
     List<Product> findAllProducts();
 
     @Query(value = "SELECT * FROM product WHERE id = :id", nativeQuery = true)
-    Product getProductById(@Param("id") Long id);
+    Product getProductById(@Param("id") Long id); // optional
 
     @Query(value = "SELECT * FROM product p JOIN categories c ON p.category_id = c.id WHERE c.name = :category_name", nativeQuery = true)
     List<Product> getProductsByCategory(@Param("category_name") String category_name);
