@@ -16,6 +16,9 @@ public class Order {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "order_tracking_number")
+    private String orderTrackingNumber;
+
     @Column(name = "user_address_id")
     private int user_address_id;
 

@@ -15,9 +15,12 @@ public class User {
     public User() {
     }
 
-    public User(String email, String password) {
+    public User(String email, String password, String first_name, String last_name, String phone_number) {
         this.email = email;
         this.password = password;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.phone_number = phone_number;
     }
 
     @Id
