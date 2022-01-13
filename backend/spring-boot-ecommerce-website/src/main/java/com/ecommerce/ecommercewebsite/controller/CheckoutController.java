@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/test")
@@ -24,7 +26,7 @@ public class CheckoutController {
 
     @PostMapping("/purchase")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public PurchaseResponse placeOrder(@RequestBody Purchase purchase) {
+    public PurchaseResponse placeOrder(@Valid @RequestBody Purchase purchase) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         PurchaseResponse purchaseResponse = checkoutService.placeOrder(purchase, userDetails);
         return purchaseResponse;

@@ -10,9 +10,11 @@ import com.ecommerce.ecommercewebsite.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -21,6 +23,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final OrderedProductRepository orderedProductRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public CheckoutServiceImpl(UserRepository userRepository, OrderRepository orderRepository, OrderedProductRepository orderedProductRepository) {
         this.userRepository = userRepository;
@@ -29,24 +33,23 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     @Override
+    @Transactional
     public PurchaseResponse placeOrder(Purchase purchase, UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername());
         Set<OrderedProduct> orderedProducts = purchase.getOrderedProducts();
 
-        String orderTrackingNumber = generateOrderTrackingNumber();
+        Query query = entityManager.createNativeQuery("SELECT UUID()");
+        String UUID = query.getSingleResult().toString();
 
-        orderRepository.insertOrder(orderTrackingNumber, purchase.getAddress().getUser_id(),
-                purchase.getUser().getId(), purchase.getStatus(), purchase.getPayment_method_id(), purchase.getShipping_method_id());
+        java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+
+        orderRepository.insertOrder(UUID, purchase.getAddress().getUser_id(), purchase.getUser().getId(),
+                purchase.getStatus(), purchase.getPayment_method_id(), purchase.getShipping_method_id(), date);
 
         orderedProducts.forEach(orderedProduct -> {
-            orderedProductRepository.insertOrderedProduct(orderedProduct.getOrder_id(), orderedProduct.getProduct_id(), orderedProduct.getQuantity());
+            orderedProductRepository.insertOrderedProduct(UUID, orderedProduct.getProduct_id(), orderedProduct.getQuantity());
         });
 
-        return new PurchaseResponse(orderTrackingNumber);
-    }
-
-    private String generateOrderTrackingNumber() {
-        //generate a random UUID number (UUID version-4)
-        return UUID.randomUUID().toString();
+        return new PurchaseResponse(UUID);
     }
 }

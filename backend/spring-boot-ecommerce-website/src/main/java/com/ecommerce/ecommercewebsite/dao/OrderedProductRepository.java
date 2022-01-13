@@ -8,10 +8,10 @@ import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 
-public interface OrderedProductRepository extends JpaRepository<OrderedProduct, Long> {
+public interface OrderedProductRepository extends JpaRepository<OrderedProduct, String> {
 
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO ordered_products (order_id, product_id, quantity) VALUES (:order_id, :product_id, :quantity)", nativeQuery = true)
-    void insertOrderedProduct(@Param("order_id") Long order_id, @Param("product_id") Long product_id, @Param("quantity") int quantity);
+    @Query(value = "INSERT INTO ordered_products (order_tracking_number, product_id, quantity) VALUES (:order_tracking_number, :product_id, :quantity)", nativeQuery = true)
+    void insertOrderedProduct(@Param("order_tracking_number") String order_tracking_number, @Param("product_id") Long product_id, @Param("quantity") int quantity);
 }

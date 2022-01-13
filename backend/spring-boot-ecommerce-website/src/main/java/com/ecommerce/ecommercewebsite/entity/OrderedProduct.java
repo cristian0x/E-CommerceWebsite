@@ -10,12 +10,8 @@ import javax.persistence.*;
 public class OrderedProduct {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name = "order_id")
-    private Long order_id;
+    @Column(name = "order_tracking_number")
+    private String order_tracking_number;
 
     @Column(name = "product_id")
     private Long product_id;
