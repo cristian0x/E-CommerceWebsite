@@ -18,7 +18,7 @@ public class OrderedProduct {
     private Long order_id;
 
     @Column(name = "product_id")
-    private int product_id;
+    private Long product_id;
 
     @Column(name = "quantity")
     private int quantity;

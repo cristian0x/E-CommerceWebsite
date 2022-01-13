@@ -1,4 +1,4 @@
-package com.ecommerce.ecommercewebsite.payload.request;
+package com.ecommerce.ecommercewebsite.security.payload.request;
 
 import java.util.Set;
 

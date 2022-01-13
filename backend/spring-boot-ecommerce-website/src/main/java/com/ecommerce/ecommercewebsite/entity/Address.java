@@ -15,7 +15,7 @@ public class Address {
     private Long id;
 
     @Column(name = "user_id")
-    private int user_id;
+    private Long user_id;
 
     @Column(name = "city")
     private String city;

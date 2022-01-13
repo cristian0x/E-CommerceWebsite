@@ -19,4 +19,9 @@ public class AddressServiceImpl implements AddressService{
     public List<Address> getAllAddressesByUserId(int user_id) {
         return addressRepository.getAllAddressesByUserId(user_id);
     }
+
+    @Override
+    public void insertAddress(Long user_id, String city, String postal_code, String street, String country, int street_number) {
+        addressRepository.insertAddress(user_id, city, postal_code, street, country, street_number);
+    }
 }
