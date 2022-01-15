@@ -27,6 +27,24 @@ public class Order {
     @Column(name = "payment_method_id")
     private int payment_method_id;
 
+    @Column(name = "shipping_method_id")
+    private int shipping_method_id;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "postal_code")
+    private String postal_code;
+
+    @Column(name = "street")
+    private String street;
+
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "street_number")
+    private int street_number;
+
     @Column(name = "date")
     @CreationTimestamp
     private Date date;

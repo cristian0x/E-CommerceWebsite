@@ -1,5 +1,6 @@
 package com.ecommerce.ecommercewebsite.entity;
 
+import com.ecommerce.ecommercewebsite.enums.ERole;
 import lombok.Data;
 
 import javax.persistence.*;

@@ -21,15 +21,15 @@ public class Opinion {
     private String description;
 
     @Column(name = "product_id")
-    private int product_id;
+    private Long product_id;
+
+    @Column(name = "user_id")
+    private Long user_id;
+
+    @Column(name = "rating")
+    private BigDecimal rating;
 
     @Column(name = "date")
     @CreationTimestamp
     private Date date;
-
-    @Column(name = "user_id")
-    private int user_id;
-
-    @Column(name = "rating")
-    private BigDecimal rating;
 }

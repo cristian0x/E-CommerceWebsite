@@ -14,5 +14,10 @@ public class Purchase {
     private String status;
     private Long payment_method_id;
     private Long shipping_method_id;
+    private String city;
+    private String postal_code;
+    private String street;
+    private String country;
+    private int street_number;
     Set<OrderedProduct> orderedProducts;
 }

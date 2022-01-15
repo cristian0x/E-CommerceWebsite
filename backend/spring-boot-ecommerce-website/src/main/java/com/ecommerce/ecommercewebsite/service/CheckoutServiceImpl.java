@@ -43,8 +43,10 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
 
-        orderRepository.insertOrder(UUID, purchase.getAddress().getUser_id(), purchase.getUser().getId(),
-                purchase.getStatus(), purchase.getPayment_method_id(), purchase.getShipping_method_id(), date);
+        orderRepository.insertOrder(UUID, purchase.getAddress().getUser_id(), user.getId(),
+                purchase.getStatus(), purchase.getPayment_method_id(), purchase.getShipping_method_id(),
+                purchase.getCity(), purchase.getPostal_code(), purchase.getStreet(), purchase.getCountry(),
+                purchase.getStreet_number(), date);
 
         orderedProducts.forEach(orderedProduct -> {
             orderedProductRepository.insertOrderedProduct(UUID, orderedProduct.getProduct_id(), orderedProduct.getQuantity());

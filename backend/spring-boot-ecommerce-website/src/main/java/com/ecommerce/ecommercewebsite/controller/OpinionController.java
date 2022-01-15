@@ -2,10 +2,8 @@ package com.ecommerce.ecommercewebsite.controller;
 
 import com.ecommerce.ecommercewebsite.entity.Opinion;
 import com.ecommerce.ecommercewebsite.service.OpinionService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,5 +21,15 @@ public class OpinionController {
     @GetMapping("/opinions")
     public List<Opinion> getAllOpinions() {
         return opinionService.getAllOpinions();
+    }
+
+    @PostMapping("/add-opinion")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    public String insertOpinion(@RequestBody Opinion opinion) {
+        java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+
+        opinionService.insertOpinion(opinion.getDescription(), opinion.getProduct_id(), opinion.getUser_id(), opinion.getRating(), date);
+
+        return "Opinion added successfully";
     }
 }
