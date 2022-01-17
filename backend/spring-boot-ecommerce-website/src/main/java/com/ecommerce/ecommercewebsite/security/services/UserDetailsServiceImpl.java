@@ -2,7 +2,6 @@ package com.ecommerce.ecommercewebsite.security.services;
 
 import com.ecommerce.ecommercewebsite.dao.UserRepository;
 import com.ecommerce.ecommercewebsite.entity.User;
-import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(user.isPresent()) {
             return UserDetailsImpl.build(userRepository.findByEmail(email));
         } else {
-            throw new ResourceNotFoundException("User with email: " + userRepository.findByEmail(email) + " does not exist");
+            throw new UsernameNotFoundException("User with email: " + userRepository.findByEmail(email) + " does not exist");
         }
     }
 }

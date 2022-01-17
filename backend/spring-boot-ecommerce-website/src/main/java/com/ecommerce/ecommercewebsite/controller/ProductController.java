@@ -3,9 +3,13 @@ package com.ecommerce.ecommercewebsite.controller;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.dto.ProductsRequest;
 import com.ecommerce.ecommercewebsite.entity.Product;
+import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
 import com.ecommerce.ecommercewebsite.service.ProductService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -20,7 +24,11 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public List<Product> getAllProducts(@RequestBody ProductsRequest productsRequest) {
+    public ResponseEntity<?> getAllProducts(@Valid @RequestBody ProductsRequest productsRequest, Errors errors) {
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Invalid parameters!"));
+        }
 
         List<Product> response;
 
@@ -31,7 +39,7 @@ public class ProductController {
                     productsRequest.getFieldToSortBy(), productsRequest.getSortDirection());
         }
 
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/category/{category_name}")

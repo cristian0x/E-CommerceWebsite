@@ -12,6 +12,7 @@ public class SignupRequest {
     private Set<String> role;
 
     @NotBlank
+    @Size(min = 6, message = "Password must have at least 6 characters")
     private String password;
 
     @NotBlank
@@ -21,6 +22,7 @@ public class SignupRequest {
     private String last_name;
 
     @NotBlank
+    @Pattern(regexp = "^[0-9]{9}$")
     private String phone_number;
 
     public String getEmail() {
