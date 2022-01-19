@@ -18,10 +18,10 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO orders (order_tracking_number, user_address_id, user_id, status, payment_method_id, shipping_method_id, city, postal_code, street, country, street_number, date) " +
-            "VALUES (:order_tracking_number, :user_address_id, :user_id, :status, :payment_method_id, :shipping_method_id, :city, :postal_code, :street, :country, :street_number, :date)", nativeQuery = true)
-    void insertOrder(@Param("order_tracking_number") String order_tracking_number, @Param("user_address_id") Long user_address_id,
-                     @Param("user_id") Long user_id, @Param("status") String status, @Param("payment_method_id") Long payment_method_id,
-                     @Param("shipping_method_id") Long shipping_method_id, @Param("city") String city, @Param("postal_code") String postal_code,
-                     @Param("street") String street, @Param("country") String country, @Param("street_number") int street_number, @Param("date") java.sql.Timestamp date);
+    @Query(value = "INSERT INTO orders (order_tracking_number, user_id, status, payment_method_id, shipping_method_id, city, postal_code, street, country, street_number, date) " +
+            "VALUES (:order_tracking_number, :user_id, :status, :payment_method_id, :shipping_method_id, :city, :postal_code, :street, :country, :street_number, :date)", nativeQuery = true)
+    void insertOrder(@Param("order_tracking_number") String order_tracking_number, @Param("user_id") Long user_id, @Param("status") String status,
+                     @Param("payment_method_id") Long payment_method_id, @Param("shipping_method_id") Long shipping_method_id, @Param("city") String city,
+                     @Param("postal_code") String postal_code, @Param("street") String street, @Param("country") String country, @Param("street_number") int street_number,
+                     @Param("date") java.sql.Timestamp date);
 }

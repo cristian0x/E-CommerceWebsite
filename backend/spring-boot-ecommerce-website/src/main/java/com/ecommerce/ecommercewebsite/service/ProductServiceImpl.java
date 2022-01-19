@@ -10,6 +10,7 @@ import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -45,6 +46,11 @@ public class ProductServiceImpl implements ProductService {
         } else {
             throw new ResourceNotFoundException("Category with name: " + category_name + " does not exist");
         }
+    }
+
+    @Override
+    public Set<Product> getUpToDateProductsInfo(Set<Integer> products) {
+        return productRepository.getUpToDateProductsInfo(products);
     }
 
     @Override

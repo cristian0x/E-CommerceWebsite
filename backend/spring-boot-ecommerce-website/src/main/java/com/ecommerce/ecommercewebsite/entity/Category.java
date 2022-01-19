@@ -21,6 +21,6 @@ public class Category {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
-    private Set<Product> products;
+    //@OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
+    //private Set<Product> products;
 }

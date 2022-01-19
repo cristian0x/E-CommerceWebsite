@@ -2,6 +2,7 @@ package com.ecommerce.ecommercewebsite.controller;
 
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.dto.ProductsRequest;
+import com.ecommerce.ecommercewebsite.dto.UpToDateProductsInfo;
 import com.ecommerce.ecommercewebsite.entity.Product;
 import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
 import com.ecommerce.ecommercewebsite.service.ProductService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @CrossOrigin("*")
 @RestController
@@ -40,6 +42,18 @@ public class ProductController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/upToDateProductsInfo")
+    public ResponseEntity<?> getUpToDateProductsInfo(@Valid @RequestBody UpToDateProductsInfo upToDateProductsInfo, Errors errors) {
+
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Invalid parameters!"));
+        }
+
+        Set<Integer> products = upToDateProductsInfo.getProducts();
+
+        return ResponseEntity.ok(productService.getUpToDateProductsInfo(products));
     }
 
     @GetMapping("/category/{category_name}")
