@@ -16,6 +16,9 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT * FROM orders LIMIT 10", nativeQuery = true)
     List<Order> getAllOrders();
 
+    @Query(value = "SELECT * FROM orders WHERE user_id = :user_id", nativeQuery = true)
+    List<Order> getAllOrdersByUserId(@Param("user_id") Long user_id);
+
     @Transactional
     @Modifying
     @Query(value = "INSERT INTO orders (order_tracking_number, user_id, status, payment_method_id, shipping_method_id, city, postal_code, street, country, street_number, date) " +
