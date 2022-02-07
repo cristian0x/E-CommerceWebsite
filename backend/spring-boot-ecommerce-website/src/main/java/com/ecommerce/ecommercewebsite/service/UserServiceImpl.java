@@ -31,4 +31,9 @@ public class UserServiceImpl implements UserService{
 
         return basicUserInfo;
     }
+
+    @Override
+    public void changeUserPassword(String newPassword, String email) {
+        userRepository.changeUserPassword(newPassword, email);
+    }
 }

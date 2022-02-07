@@ -2,9 +2,12 @@ package com.ecommerce.ecommercewebsite.dao;
 
 import com.ecommerce.ecommercewebsite.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import javax.transaction.Transactional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -25,4 +28,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT first_name, last_name, email, phone_number FROM users WHERE email = :email", nativeQuery = true)
     User getBasicUserInfoByEmail(@Param("email") String email);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE users SET password = :newPassword WHERE email = :email", nativeQuery = true)
+    void changeUserPassword(@Param("newPassword") String newPassword, @Param("email") String email);
 }
