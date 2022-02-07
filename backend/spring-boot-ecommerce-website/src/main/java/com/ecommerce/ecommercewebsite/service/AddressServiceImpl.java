@@ -16,7 +16,7 @@ public class AddressServiceImpl implements AddressService{
     }
 
     @Override
-    public List<Address> getAllAddressesByUserId(int user_id) {
+    public List<Address> getAllAddressesByUserId(Long user_id) {
         return addressRepository.getAllAddressesByUserId(user_id);
     }
 

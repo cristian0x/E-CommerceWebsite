@@ -28,4 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "SELECT * FROM product WHERE id IN (:products)", nativeQuery = true)
     Set<Product> getUpToDateProductsInfo(@Param("products") Set<Integer> products);
+
+    @Query(value = "SELECT count(DISTINCT id) FROM product", nativeQuery = true)
+    int getProductQuantity();
 }

@@ -13,4 +13,5 @@ public interface ProductService {
     List<Product> getProductsByCategory(String category_name);
     Set<Product> getUpToDateProductsInfo(Set<Integer> products);
     ProductInfo getProductById(Long id);
+    int getProductQuantity();
 }

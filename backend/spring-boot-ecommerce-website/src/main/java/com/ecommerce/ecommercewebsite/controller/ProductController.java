@@ -66,4 +66,9 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
+    @GetMapping("/productsQuantity")
+    public int getProductsQuantity() {
+        return productService.getProductQuantity();
+    }
+
 }
