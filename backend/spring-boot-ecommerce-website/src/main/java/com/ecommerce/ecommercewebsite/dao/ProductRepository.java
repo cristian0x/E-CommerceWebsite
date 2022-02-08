@@ -2,9 +2,11 @@ package com.ecommerce.ecommercewebsite.dao;
 
 import com.ecommerce.ecommercewebsite.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
@@ -30,5 +32,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Set<Product> getUpToDateProductsInfo(@Param("products") Set<Integer> products);
 
     @Query(value = "SELECT count(DISTINCT id) FROM product", nativeQuery = true)
-    int getProductQuantity();
+    int getAllProductQuantity();
+
+    @Query(value = "SELECT units_in_stock FROM product WHERE id = :id", nativeQuery = true)
+    int getProductUnitsInStock(@Param("id") Long id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE product SET units_in_stock = :updatedUnitsInStock WHERE id = :productId", nativeQuery = true)
+    void decreaseUnitsInStock(@Param("updatedUnitsInStock") int updatedUnitsInStock, @Param("productId") Long productId);
 }

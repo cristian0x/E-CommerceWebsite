@@ -2,11 +2,13 @@ package com.ecommerce.ecommercewebsite.service;
 
 import com.ecommerce.ecommercewebsite.dao.OrderRepository;
 import com.ecommerce.ecommercewebsite.dao.OrderedProductRepository;
+import com.ecommerce.ecommercewebsite.dao.ProductRepository;
 import com.ecommerce.ecommercewebsite.dao.UserRepository;
 import com.ecommerce.ecommercewebsite.dto.Purchase;
 import com.ecommerce.ecommercewebsite.dto.PurchaseResponse;
 import com.ecommerce.ecommercewebsite.entity.OrderedProduct;
 import com.ecommerce.ecommercewebsite.entity.User;
+import com.ecommerce.ecommercewebsite.exception.NotEnoughUnitsInStockException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +25,20 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final OrderedProductRepository orderedProductRepository;
+    private final ProductRepository productRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
-    public CheckoutServiceImpl(UserRepository userRepository, OrderRepository orderRepository, OrderedProductRepository orderedProductRepository) {
+    public CheckoutServiceImpl(UserRepository userRepository, OrderRepository orderRepository,
+                               OrderedProductRepository orderedProductRepository, ProductRepository productRepository) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.orderedProductRepository = orderedProductRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackOn = NotEnoughUnitsInStockException.class)
     public PurchaseResponse placeOrder(Purchase purchase, UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername());
         Set<OrderedProduct> orderedProducts = purchase.getOrderedProducts();
@@ -49,6 +54,15 @@ public class CheckoutServiceImpl implements CheckoutService {
                 purchase.getStreet(), purchase.getCountry(), purchase.getStreet_number(), date);
 
         orderedProducts.forEach(orderedProduct -> {
+            int unitsInStock = productRepository.getProductUnitsInStock(orderedProduct.getProduct_id());
+            int updatedUnitsInStock = unitsInStock - (int) orderedProduct.getQuantity();
+            boolean checkIfThereIsEnoughUnitsInStock = (updatedUnitsInStock >= 0) ? true : false;
+
+            if (!checkIfThereIsEnoughUnitsInStock) {
+                throw new NotEnoughUnitsInStockException("There is not enough units in stock for an item with an id: " + orderedProduct.getProduct_id());
+            }
+
+            productRepository.decreaseUnitsInStock(updatedUnitsInStock, orderedProduct.getProduct_id());
             orderedProductRepository.insertOrderedProduct(UUID, orderedProduct.getProduct_id(), orderedProduct.getQuantity());
         });
 
