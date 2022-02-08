@@ -1,5 +1,6 @@
 package com.ecommerce.ecommercewebsite.controller;
 
+import com.ecommerce.ecommercewebsite.dto.FilterRequest;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.dto.ProductsRequest;
 import com.ecommerce.ecommercewebsite.dto.UpToDateProductsInfo;
@@ -71,4 +72,8 @@ public class ProductController {
         return productService.getProductQuantity();
     }
 
+    @PostMapping("/filteredProducts")
+    public ResponseEntity<?> getFilteredProducts(@Valid @RequestBody FilterRequest filterRequest) {
+        return ResponseEntity.ok(productService.getFilteredProducts(filterRequest));
+    }
 }

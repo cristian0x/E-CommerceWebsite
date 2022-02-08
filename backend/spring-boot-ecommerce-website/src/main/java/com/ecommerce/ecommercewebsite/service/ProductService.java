@@ -1,5 +1,6 @@
 package com.ecommerce.ecommercewebsite.service;
 
+import com.ecommerce.ecommercewebsite.dto.FilterRequest;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.entity.Product;
 
@@ -14,4 +15,5 @@ public interface ProductService {
     Set<Product> getUpToDateProductsInfo(Set<Integer> products);
     ProductInfo getProductById(Long id);
     int getProductQuantity();
+    List<Product> getFilteredProducts(FilterRequest filterRequest);
 }

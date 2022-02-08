@@ -22,7 +22,8 @@ public class SearchController {
         List<Product> searchResult;
 
         try {
-            Query query = entityManager.createNativeQuery("SELECT * FROM product WHERE MATCH(name, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE) LIMIT 10");
+            Query query = entityManager.createNativeQuery
+                    ("SELECT * FROM product WHERE MATCH(name, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE) LIMIT 10");
             query.setParameter("keyword", keyword);
 
             searchResult = query.getResultList();

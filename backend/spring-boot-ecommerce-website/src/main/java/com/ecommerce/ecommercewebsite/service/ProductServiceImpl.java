@@ -2,21 +2,30 @@ package com.ecommerce.ecommercewebsite.service;
 
 import com.ecommerce.ecommercewebsite.dao.OpinionRepository;
 import com.ecommerce.ecommercewebsite.dao.ProductRepository;
+import com.ecommerce.ecommercewebsite.dto.FilterRequest;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.entity.Opinion;
 import com.ecommerce.ecommercewebsite.entity.Product;
 import org.springframework.stereotype.Service;
 import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
     private final OpinionRepository opinionRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public ProductServiceImpl(ProductRepository productRepository, OpinionRepository opinionRepository) {
         this.productRepository = productRepository;
@@ -82,4 +91,40 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.getAllProductQuantity();
     }
 
+    @Override
+    public List<Product> getFilteredProducts(FilterRequest filterRequest) {
+        Set<Integer> categories = (filterRequest.getCategories() == null || filterRequest.getCategories().isEmpty())
+                ? Stream.of(1, 2, 3, 4, 5, 6, 7, 8).collect(Collectors.toSet()) : filterRequest.getCategories();
+        int minPrice = ((Integer) filterRequest.getMinPrice() != null || String.valueOf(filterRequest.getMinPrice()).trim() != "")
+                ? filterRequest.getMinPrice() : 0;
+        int maxPrice = ((Integer) filterRequest.getMaxPrice() != null || String.valueOf(filterRequest.getMaxPrice()).trim() != "")
+                ? filterRequest.getMaxPrice() : Integer.MAX_VALUE;
+        int page = filterRequest.getPage();
+        int size = filterRequest.getSize();
+        String fieldToSortBy = ((filterRequest.getFieldToSortBy()).isEmpty()) ? null : filterRequest.getFieldToSortBy();
+        String sortDirection = (filterRequest.getSortDirection().isEmpty()) ? "" : filterRequest.getSortDirection();
+        String searchValue = (filterRequest.getSearchValue() == null) ? "" : "";
+
+        String nativeQuery;
+        String searchQuery = "";
+        List<Product> filteredProducts;
+        if (maxPrice == 0) maxPrice = Integer.MAX_VALUE;
+
+        if (!searchValue.isEmpty()) {
+            searchQuery = "AND MATCH(name, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE) ";
+        }
+
+        nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN :categories "
+                + searchQuery + "ORDER BY " + fieldToSortBy + " " + sortDirection + " LIMIT " + size + " OFFSET " + page;
+
+        Query query = entityManager.createNativeQuery(nativeQuery);
+        query.setParameter("categories", categories);
+        if (!searchValue.isEmpty()) {
+            query.setParameter("keyword", searchValue);
+        }
+
+        filteredProducts = query.getResultList();
+
+        return filteredProducts;
+    }
 }
