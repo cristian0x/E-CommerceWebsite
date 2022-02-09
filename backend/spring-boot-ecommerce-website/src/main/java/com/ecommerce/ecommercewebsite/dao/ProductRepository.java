@@ -30,7 +30,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> getProductsByCategory(@Param("category_name") String category_name);
 
     @Query(value = "SELECT * FROM product WHERE id IN (:products)", nativeQuery = true)
-    Set<Product> getUpToDateProductsInfo(@Param("products") Set<Integer> products);
+    Set<Product> getUpToDateProductsInfo(@Param("products") Set<Long> products);
 
     @Query(value = "SELECT count(DISTINCT id) FROM product", nativeQuery = true)
     int getAllProductQuantity();

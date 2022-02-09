@@ -4,6 +4,7 @@ import com.ecommerce.ecommercewebsite.dao.OpinionRepository;
 import com.ecommerce.ecommercewebsite.dao.ProductRepository;
 import com.ecommerce.ecommercewebsite.dto.FilterRequest;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
+import com.ecommerce.ecommercewebsite.dto.UpToDateProductInfoResponse;
 import com.ecommerce.ecommercewebsite.entity.Opinion;
 import com.ecommerce.ecommercewebsite.entity.Product;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,8 @@ import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,8 +58,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Set<Product> getUpToDateProductsInfo(Set<Integer> products) {
-        return productRepository.getUpToDateProductsInfo(products);
+    public UpToDateProductInfoResponse getUpToDateProductsInfo(Set<Long> products, HashMap<Long, Integer> quantity) {
+        UpToDateProductInfoResponse upToDateProductInfoResponse = new UpToDateProductInfoResponse();
+
+        Set<Product> productSet = productRepository.getUpToDateProductsInfo(products);
+
+        upToDateProductInfoResponse.setProducts(productSet);
+
+        BigDecimal totalPrice = productSet.stream()
+                .map(product -> product.getUnitPrice().multiply(BigDecimal.valueOf(quantity.get(product.getId()))))
+                .reduce((a, b) -> a.add(b)).get();
+
+        upToDateProductInfoResponse.setTotalPrice(totalPrice);
+
+        return upToDateProductInfoResponse;
     }
 
     @Override
@@ -124,7 +136,9 @@ public class ProductServiceImpl implements ProductService {
                 query.setParameter("keyword", searchValue);
             }
 
-            filteredProducts = query.getResultList();
+            //filteredProducts = query.getResultList();
+
+            filteredProducts = (List<Product>) query.getResultStream().collect(Collectors.toList());
         } catch (Exception exception) {
             exception.printStackTrace();
             throw exception;

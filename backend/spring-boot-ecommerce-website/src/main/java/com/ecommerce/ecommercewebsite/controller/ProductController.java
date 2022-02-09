@@ -1,9 +1,7 @@
 package com.ecommerce.ecommercewebsite.controller;
 
-import com.ecommerce.ecommercewebsite.dto.FilterRequest;
-import com.ecommerce.ecommercewebsite.dto.ProductInfo;
-import com.ecommerce.ecommercewebsite.dto.ProductsRequest;
-import com.ecommerce.ecommercewebsite.dto.UpToDateProductsInfo;
+import com.ecommerce.ecommercewebsite.dto.*;
+import com.ecommerce.ecommercewebsite.entity.OrderedProduct;
 import com.ecommerce.ecommercewebsite.entity.Product;
 import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
 import com.ecommerce.ecommercewebsite.service.ProductService;
@@ -12,8 +10,11 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @CrossOrigin("*")
 @RestController
@@ -52,9 +53,17 @@ public class ProductController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Invalid parameters!"));
         }
 
-        Set<Integer> products = upToDateProductsInfo.getProducts();
+        Set<OrderedProduct> orderedProducts = upToDateProductsInfo.getOrderedProducts();
 
-        return ResponseEntity.ok(productService.getUpToDateProductsInfo(products));
+        Set<Long> products = orderedProducts.stream().map(OrderedProduct::getProduct_id).collect(Collectors.toSet());
+
+        HashMap<Long, Integer> quantity  = new HashMap<>();
+
+        orderedProducts.stream().forEach(orderedProduct -> quantity.put(orderedProduct.getProduct_id(), orderedProduct.getQuantity()));
+
+        UpToDateProductInfoResponse upToDateProductInfoResponse = productService.getUpToDateProductsInfo(products, quantity);
+
+        return ResponseEntity.ok(upToDateProductInfoResponse);
     }
 
     @GetMapping("/category/{category_name}")
@@ -74,6 +83,9 @@ public class ProductController {
 
     @PostMapping("/filteredProducts")
     public ResponseEntity<?> getFilteredProducts(@Valid @RequestBody FilterRequest filterRequest) {
-        return ResponseEntity.ok(productService.getFilteredProducts(filterRequest));
+
+        List<Product> response = productService.getFilteredProducts(filterRequest);
+
+        return ResponseEntity.ok(response);
     }
 }
