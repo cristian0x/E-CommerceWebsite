@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -41,4 +42,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query(value = "UPDATE product SET units_in_stock = :updatedUnitsInStock WHERE id = :productId", nativeQuery = true)
     void decreaseUnitsInStock(@Param("updatedUnitsInStock") int updatedUnitsInStock, @Param("productId") Long productId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM product WHERE id = :productId", nativeQuery = true)
+    void deleteProduct(@Param("productId") Long productId);
+
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT INTO product (name, description, unit_price, units_in_stock, category_id, active, date_created, last_updated) VALUES " +
+            "(:name, :description, :unitPrice, :unitsInStock, :categoryId, :active, :currentDate, :currentDate)", nativeQuery = true)
+    void addProduct(@Param("name") String name, @Param("description") String description, @Param("unitPrice") BigDecimal unitPrice,
+                    @Param("unitsInStock") int unitsInStock, @Param("categoryId") int categoryId, @Param("active") Boolean active,
+                    @Param("currentDate") java.sql.Timestamp currentDate);
+
+    @Query(value = "SELECT * FROM product WHERE name = :name", nativeQuery = true)
+    Product getProductByName(@Param("name") String name);
 }

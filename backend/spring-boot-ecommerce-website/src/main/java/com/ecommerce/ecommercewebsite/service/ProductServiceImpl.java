@@ -103,7 +103,7 @@ public class ProductServiceImpl implements ProductService {
         int size = filterRequest.getSize();
         String fieldToSortBy = ((filterRequest.getFieldToSortBy()).isEmpty()) ? null : filterRequest.getFieldToSortBy();
         String sortDirection = (filterRequest.getSortDirection().isEmpty()) ? "" : filterRequest.getSortDirection();
-        String searchValue = (filterRequest.getSearchValue() == null) ? "" : "";
+        String searchValue = (filterRequest.getSearchValue() == null) ? "" : filterRequest.getSearchValue();
 
         String nativeQuery;
         String searchQuery = "";
@@ -117,13 +117,18 @@ public class ProductServiceImpl implements ProductService {
         nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN :categories "
                 + searchQuery + "ORDER BY " + fieldToSortBy + " " + sortDirection + " LIMIT " + size + " OFFSET " + page;
 
-        Query query = entityManager.createNativeQuery(nativeQuery);
-        query.setParameter("categories", categories);
-        if (!searchValue.isEmpty()) {
-            query.setParameter("keyword", searchValue);
-        }
+        try {
+            Query query = entityManager.createNativeQuery(nativeQuery);
+            query.setParameter("categories", categories);
+            if (!searchValue.isEmpty()) {
+                query.setParameter("keyword", searchValue);
+            }
 
-        filteredProducts = query.getResultList();
+            filteredProducts = query.getResultList();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw exception;
+        }
 
         return filteredProducts;
     }
