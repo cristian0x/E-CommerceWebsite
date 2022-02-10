@@ -3,6 +3,7 @@ package com.ecommerce.ecommercewebsite.controller;
 import com.ecommerce.ecommercewebsite.dto.Purchase;
 import com.ecommerce.ecommercewebsite.dto.PurchaseResponse;
 import com.ecommerce.ecommercewebsite.exception.NotEnoughUnitsInStockException;
+import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
 import com.ecommerce.ecommercewebsite.service.CheckoutService;
 import com.ecommerce.ecommercewebsite.service.OrderService;
@@ -42,6 +43,8 @@ public class CheckoutController {
             return ResponseEntity.ok(purchaseResponse);
         } catch (NotEnoughUnitsInStockException notEnoughUnitsInStockException) {
             return ResponseEntity.badRequest().body(new MessageResponse(notEnoughUnitsInStockException.getMessage()));
+        } catch (ResourceNotFoundException resourceNotFoundException) {
+            return ResponseEntity.badRequest().body(resourceNotFoundException.getMessage());
         }
     }
 }

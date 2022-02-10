@@ -9,6 +9,7 @@ import com.ecommerce.ecommercewebsite.dto.PurchaseResponse;
 import com.ecommerce.ecommercewebsite.entity.OrderedProduct;
 import com.ecommerce.ecommercewebsite.entity.User;
 import com.ecommerce.ecommercewebsite.exception.NotEnoughUnitsInStockException;
+import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,10 @@ public class CheckoutServiceImpl implements CheckoutService {
                 purchase.getStreet(), purchase.getCountry(), purchase.getStreet_number(), date);
 
         orderedProducts.forEach(orderedProduct -> {
+            if (productRepository.getProductById(orderedProduct.getProduct_id()) == null) {
+                throw new ResourceNotFoundException("Product with an id: " + orderedProduct.getProduct_id() + " not found");
+            }
+
             int unitsInStock = productRepository.getProductUnitsInStock(orderedProduct.getProduct_id());
             int updatedUnitsInStock = unitsInStock - (int) orderedProduct.getQuantity();
             boolean checkIfThereIsEnoughUnitsInStock = (updatedUnitsInStock >= 0) ? true : false;

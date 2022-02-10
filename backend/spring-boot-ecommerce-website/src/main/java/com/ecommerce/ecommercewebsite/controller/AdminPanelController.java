@@ -25,7 +25,7 @@ public class AdminPanelController {
         this.adminPanelService = adminPanelService;
     }
 
-    @PostMapping("/changeOrderStatus")
+    @PutMapping("/changeOrderStatus")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> changeOrderStatus(@Valid @RequestBody ChangeOrderStatusRequest changeOrderStatusRequest) {
 
@@ -38,7 +38,7 @@ public class AdminPanelController {
         return ResponseEntity.ok("Status has been changed successfully");
     }
 
-    @GetMapping("/deleteProduct/{productId}")
+    @DeleteMapping("/deleteProduct/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteProduct(@PathVariable @Size(min = 1) @NotNull @NotEmpty Long productId) {
 

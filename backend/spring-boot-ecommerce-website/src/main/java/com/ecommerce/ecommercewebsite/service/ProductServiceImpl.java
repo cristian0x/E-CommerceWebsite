@@ -10,9 +10,7 @@ import com.ecommerce.ecommercewebsite.entity.Product;
 import org.springframework.stereotype.Service;
 import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -123,22 +121,29 @@ public class ProductServiceImpl implements ProductService {
         if (maxPrice == 0) maxPrice = Integer.MAX_VALUE;
 
         if (!searchValue.isEmpty()) {
-            searchQuery = "AND MATCH(name, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE) ";
+            searchQuery = "AND MATCH(name, description) AGAINST('" + searchValue + "' IN NATURAL LANGUAGE MODE) ";
         }
 
-        nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN :categories "
+        String categoriesString = categories.stream().map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        System.out.println(categoriesString);
+
+        nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN (" + categoriesString + ") "
                 + searchQuery + "ORDER BY " + fieldToSortBy + " " + sortDirection + " LIMIT " + size + " OFFSET " + page;
+
+        System.out.println(nativeQuery);
 
         try {
             Query query = entityManager.createNativeQuery(nativeQuery);
-            query.setParameter("categories", categories);
+            //query.setParameter("categories", categories);
             if (!searchValue.isEmpty()) {
-                query.setParameter("keyword", searchValue);
+                //query.setParameter("keyword", searchValue);
             }
 
-            //filteredProducts = query.getResultList();
+            filteredProducts = query.getResultList();
 
-            filteredProducts = (List<Product>) query.getResultStream().collect(Collectors.toList());
+            //filteredProducts = (List<Product>) query.getResultStream().collect(Collectors.toList());
         } catch (Exception exception) {
             exception.printStackTrace();
             throw exception;
