@@ -20,7 +20,7 @@ public class Address {
     @Column(name = "user_id")
     private Long user_id;
 
-    @Pattern(regexp = "^[A-Za-z]{1,32}$")
+    @Pattern(regexp = "^[A-Za-z ]{1,32}$")
     @Column(name = "city")
     private String city;
 
@@ -28,11 +28,11 @@ public class Address {
     @Column(name = "postal_code")
     private String postal_code;
 
-    @Pattern(regexp = "^[A-Za-z]{1,32}$")
+    @Pattern(regexp = "^[A-Za-z ]{1,32}$")
     @Column(name = "street")
     private String street;
 
-    @Pattern(regexp = "^[A-Za-z]{1,32}$")
+    @Pattern(regexp = "^[A-Za-z ]{1,32}$")
     @Column(name = "country")
     private String country;
 

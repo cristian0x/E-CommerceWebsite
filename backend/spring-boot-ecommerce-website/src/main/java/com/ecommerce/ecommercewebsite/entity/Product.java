@@ -39,6 +39,9 @@ public class Product {
     @Column(name = "active")
     private boolean active;
 
+    @Column(name = "average_rating")
+    private BigDecimal average_rating;
+
     @Column(name = "date_created")
     @CreationTimestamp
     private Date dateCreated;

@@ -15,7 +15,7 @@ public interface OpinionRepository extends JpaRepository<Opinion, Long> {
     @Query(value = "SELECT * FROM opinions LIMIT 10", nativeQuery = true)
     List<Opinion> getAllOpinions();
 
-    @Query(value = "SELECT * FROM opinions WHERE product_id = :product_id", nativeQuery = true)
+    @Query(value = "SELECT * FROM opinions WHERE product_id = :product_id ORDER BY date DESC", nativeQuery = true)
     List<Opinion> getOpinionsByProductId(@Param("product_id") Long product_id);
 
     @Transactional

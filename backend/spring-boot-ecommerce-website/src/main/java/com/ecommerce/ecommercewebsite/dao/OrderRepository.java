@@ -1,5 +1,6 @@
 package com.ecommerce.ecommercewebsite.dao;
 
+import com.ecommerce.ecommercewebsite.dto.MyOrdersCustomProductInfo;
 import com.ecommerce.ecommercewebsite.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -64,4 +65,8 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT op.product_id FROM orders o JOIN ordered_products op ON o.order_tracking_number = op.order_tracking_number GROUP BY op.product_id " +
             "ORDER BY SUM(op.quantity) LIMIT 1;", nativeQuery = true)
     Long getLeastFrequentlyBoughtProductId();
+
+    //@Query(value = "SELECT op.product_id, p.name, op.quantity, (p.unit_price * op.quantity) AS totalPrice FROM ordered_products op JOIN product p ON op.product_id = p.id " +
+    //        "WHERE op.order_tracking_number = :order_tracking_number", nativeQuery = true)
+    //List<MyOrdersCustomProductInfo> getMyOrdersCustomProductInfo(@Param("order_tracking_number") String order_tracking_number);
 }

@@ -14,5 +14,6 @@ public class ProductInfo {
     private String imagePath;
     private int unitsInStock;
     private int opinionCount;
+    private BigDecimal average_rating;
     private List<Opinion> opinions;
 }

@@ -58,4 +58,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query(value = "SELECT * FROM product WHERE name = :name", nativeQuery = true)
     Product getProductByName(@Param("name") String name);
+
+    @Query(value = "SELECT p.name FROM product p JOIN ordered_products op ON p.id = op.product_id " +
+            "WHERE op.order_tracking_number = :order_tracking_number AND product_id = :product_id", nativeQuery = true)
+    String getNameByOrderTrackingNumber(@Param("order_tracking_number") String order_tracking_number, @Param("product_id") Long product_id);
+
+    @Query(value = "SELECT unit_price FROM product WHERE id = :product_id", nativeQuery = true)
+    BigDecimal getProductUnitPriceById(@Param("product_id") Long product_id);
 }
