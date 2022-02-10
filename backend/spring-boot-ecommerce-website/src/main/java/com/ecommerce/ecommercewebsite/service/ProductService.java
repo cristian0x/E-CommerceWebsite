@@ -1,9 +1,11 @@
 package com.ecommerce.ecommercewebsite.service;
 
 import com.ecommerce.ecommercewebsite.dto.FilterRequest;
+import com.ecommerce.ecommercewebsite.dto.FilteredProducts;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.dto.UpToDateProductInfoResponse;
 import com.ecommerce.ecommercewebsite.entity.Product;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +17,7 @@ public interface ProductService {
     List<Product> getAllProductsWithPaginationAndSorting(int size, int offset, String fieldToSortBy, String sortDirection);
     List<Product> getProductsByCategory(String category_name);
     UpToDateProductInfoResponse getUpToDateProductsInfo(Set<Long> products, HashMap<Long, Integer> quantity);
-    ProductInfo getProductById(Long id);
+    ProductInfo getProductById(Long id, UserDetails userDetails);
     int getProductQuantity();
-    List<Product> getFilteredProducts(FilterRequest filterRequest);
+    FilteredProducts getFilteredProducts(FilterRequest filterRequest);
 }

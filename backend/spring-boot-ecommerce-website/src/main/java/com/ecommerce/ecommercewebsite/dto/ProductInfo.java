@@ -15,5 +15,6 @@ public class ProductInfo {
     private int unitsInStock;
     private int opinionCount;
     private BigDecimal average_rating;
+    private Boolean isAddingOpinionPossible;
     private List<Opinion> opinions;
 }

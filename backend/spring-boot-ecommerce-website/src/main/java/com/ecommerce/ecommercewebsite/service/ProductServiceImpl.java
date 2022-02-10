@@ -1,17 +1,23 @@
 package com.ecommerce.ecommercewebsite.service;
 
 import com.ecommerce.ecommercewebsite.dao.OpinionRepository;
+import com.ecommerce.ecommercewebsite.dao.OrderedProductRepository;
 import com.ecommerce.ecommercewebsite.dao.ProductRepository;
+import com.ecommerce.ecommercewebsite.dao.UserRepository;
 import com.ecommerce.ecommercewebsite.dto.FilterRequest;
+import com.ecommerce.ecommercewebsite.dto.FilteredProducts;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.dto.UpToDateProductInfoResponse;
 import com.ecommerce.ecommercewebsite.entity.Opinion;
+import com.ecommerce.ecommercewebsite.entity.OrderedProduct;
 import com.ecommerce.ecommercewebsite.entity.Product;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.ecommerce.ecommercewebsite.exception.ResourceNotFoundException;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,15 +25,19 @@ import java.util.stream.Stream;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
     private final OpinionRepository opinionRepository;
+    private final OrderedProductRepository orderedProductRepository;
+    private final UserRepository userRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ProductServiceImpl(ProductRepository productRepository, OpinionRepository opinionRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, OpinionRepository opinionRepository, OrderedProductRepository orderedProductRepository, UserRepository userRepository) {
         this.productRepository = productRepository;
         this.opinionRepository = opinionRepository;
+        this.orderedProductRepository = orderedProductRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -73,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductInfo getProductById(Long id) {
+    public ProductInfo getProductById(Long id, UserDetails userDetails) {
         ProductInfo productInfo = new ProductInfo();
 
         Optional<Product> product = Optional.ofNullable(productRepository.getProductById(id));
@@ -82,12 +92,26 @@ public class ProductServiceImpl implements ProductService {
             Product productById = productRepository.getProductById(id);
             List<Opinion> opinions = opinionRepository.getOpinionsByProductId(id);
 
+            Boolean isAddingOpinionPossible = false;
+
+            if (userDetails != null) {
+                Long user_id = userRepository.getUserIdByEmail(userDetails.getUsername());
+                int checkIfUserBoughtProductByIds = orderedProductRepository.checkIfUserBoughtProductByIds(user_id, id);
+                int checkIfUserAddedOpinionById = opinionRepository.checkIfUserAddedOpinionById(user_id, id);
+
+                if (checkIfUserBoughtProductByIds == 1 && checkIfUserAddedOpinionById == 0) {
+                    isAddingOpinionPossible = true;
+                }
+            }
+
             productInfo.setName(productById.getName());
             productInfo.setDescription(productById.getDescription());
             productInfo.setUnitPrice(productById.getUnitPrice());
             productInfo.setImagePath(productById.getImagePath());
             productInfo.setUnitsInStock(productById.getUnitsInStock());
             productInfo.setOpinionCount(opinions.size());
+            productInfo.setAverage_rating(product.get().getAverage_rating());
+            productInfo.setIsAddingOpinionPossible(isAddingOpinionPossible);
             productInfo.setOpinions(opinions);
 
 			return productInfo;
@@ -102,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getFilteredProducts(FilterRequest filterRequest) {
+    public FilteredProducts getFilteredProducts(FilterRequest filterRequest) {
         Set<Integer> categories = (filterRequest.getCategories() == null || filterRequest.getCategories().isEmpty())
                 ? Stream.of(1, 2, 3, 4, 5, 6, 7, 8).collect(Collectors.toSet()) : filterRequest.getCategories();
         int minPrice = ((Integer) filterRequest.getMinPrice() != null || String.valueOf(filterRequest.getMinPrice()).trim() != "")
@@ -115,35 +139,36 @@ public class ProductServiceImpl implements ProductService {
         String sortDirection = (filterRequest.getSortDirection().isEmpty()) ? "" : filterRequest.getSortDirection();
         String searchValue = (filterRequest.getSearchValue() == null) ? "" : filterRequest.getSearchValue();
 
-        String nativeQuery;
         String searchQuery = "";
-        List<Product> filteredProducts;
+        FilteredProducts filteredProducts = new FilteredProducts();
+
         if (maxPrice == 0) maxPrice = Integer.MAX_VALUE;
 
         if (!searchValue.isEmpty()) {
-            searchQuery = "AND MATCH(name, description) AGAINST('" + searchValue + "' IN NATURAL LANGUAGE MODE) ";
+            searchQuery = "AND MATCH(name, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE) ";
         }
 
-        String categoriesString = categories.stream().map(String::valueOf)
-                .collect(Collectors.joining(","));
-
-        System.out.println(categoriesString);
-
-        nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN (" + categoriesString + ") "
+        String nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN :categories "
                 + searchQuery + "ORDER BY " + fieldToSortBy + " " + sortDirection + " LIMIT " + size + " OFFSET " + page;
 
-        System.out.println(nativeQuery);
+        String queryToGetProductsQuantityString = "SELECT COUNT(*) FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice +
+                " AND category_id IN :categories " + searchQuery + "ORDER BY " + fieldToSortBy + " " + sortDirection;
 
         try {
-            Query query = entityManager.createNativeQuery(nativeQuery);
-            //query.setParameter("categories", categories);
+            Query query = entityManager.createNativeQuery(nativeQuery, Product.class);
+            query.setParameter("categories", categories);
             if (!searchValue.isEmpty()) {
-                //query.setParameter("keyword", searchValue);
+                query.setParameter("keyword", searchValue);
             }
 
-            filteredProducts = query.getResultList();
+            Query queryToGetProductsQuantity = entityManager.createNativeQuery(queryToGetProductsQuantityString);
+            queryToGetProductsQuantity.setParameter("categories", categories);
+            if (!searchValue.isEmpty()) {
+                query.setParameter("keyword", searchValue);
+            }
 
-            //filteredProducts = (List<Product>) query.getResultStream().collect(Collectors.toList());
+            filteredProducts.setProducts(query.getResultList());
+            filteredProducts.setQuantity(((BigInteger) queryToGetProductsQuantity.getSingleResult()).intValue());
         } catch (Exception exception) {
             exception.printStackTrace();
             throw exception;

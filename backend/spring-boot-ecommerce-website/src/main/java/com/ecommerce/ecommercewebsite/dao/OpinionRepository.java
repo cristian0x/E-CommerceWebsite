@@ -23,4 +23,7 @@ public interface OpinionRepository extends JpaRepository<Opinion, Long> {
     @Query(value = "INSERT INTO opinions (description, product_id, user_id, rating, date) VALUES (:description, :product_id, :user_id, :rating, :date)", nativeQuery = true)
     void insertOpinion(@Param("description") String description, @Param("product_id") Long product_id, @Param("user_id") Long user_id,
                        @Param("rating") BigDecimal rating, @Param("date") java.sql.Timestamp date);
+
+    @Query(value = "SELECT EXISTS(SELECT * FROM opinions WHERE user_id = :user_id AND product_id = :product_id)", nativeQuery = true)
+    int checkIfUserAddedOpinionById(@Param("user_id") Long user_id, @Param("product_id") Long product_id);
 }

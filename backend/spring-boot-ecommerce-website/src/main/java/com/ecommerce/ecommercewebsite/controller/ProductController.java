@@ -6,6 +6,9 @@ import com.ecommerce.ecommercewebsite.entity.Product;
 import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
 import com.ecommerce.ecommercewebsite.service.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,7 +75,14 @@ public class ProductController {
 
     @GetMapping("/product/{id}")
     public ProductInfo getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() != "anonymousUser") {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            return productService.getProductById(id, userDetails);
+        } else {
+            return productService.getProductById(id, null);
+        }
     }
 
     @GetMapping("/productsQuantity")
@@ -83,7 +93,7 @@ public class ProductController {
     @PostMapping("/filteredProducts")
     public ResponseEntity<?> getFilteredProducts(@Valid @RequestBody FilterRequest filterRequest) {
 
-        List<Product> response = productService.getFilteredProducts(filterRequest);
+        FilteredProducts response = productService.getFilteredProducts(filterRequest);
 
         return ResponseEntity.ok(response);
     }
