@@ -156,13 +156,12 @@ public class ProductServiceImpl implements ProductService {
         try {
             Query query = entityManager.createNativeQuery(nativeQuery, Product.class);
             query.setParameter("categories", categories);
-            if (!searchValue.isEmpty()) {
-                query.setParameter("keyword", searchValue + "*");
-            }
 
             Query queryToGetProductsQuantity = entityManager.createNativeQuery(queryToGetProductsQuantityString);
             queryToGetProductsQuantity.setParameter("categories", categories);
+
             if (!searchValue.isEmpty()) {
+                query.setParameter("keyword", searchValue + "*");
                 queryToGetProductsQuantity.setParameter("keyword", searchValue + "*");
             }
 
