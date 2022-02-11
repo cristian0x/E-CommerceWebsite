@@ -9,7 +9,6 @@ import com.ecommerce.ecommercewebsite.dto.FilteredProducts;
 import com.ecommerce.ecommercewebsite.dto.ProductInfo;
 import com.ecommerce.ecommercewebsite.dto.UpToDateProductInfoResponse;
 import com.ecommerce.ecommercewebsite.entity.Opinion;
-import com.ecommerce.ecommercewebsite.entity.OrderedProduct;
 import com.ecommerce.ecommercewebsite.entity.Product;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -145,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
         if (maxPrice == 0) maxPrice = Integer.MAX_VALUE;
 
         if (!searchValue.isEmpty()) {
-            searchQuery = "AND MATCH(name, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE) ";
+            searchQuery = "AND MATCH(name, description) AGAINST(:keyword IN BOOLEAN MODE) ";
         }
 
         String nativeQuery = "SELECT * FROM product WHERE unit_price >= " + minPrice + " AND unit_price <= " + maxPrice + " AND category_id IN :categories "
@@ -158,13 +157,13 @@ public class ProductServiceImpl implements ProductService {
             Query query = entityManager.createNativeQuery(nativeQuery, Product.class);
             query.setParameter("categories", categories);
             if (!searchValue.isEmpty()) {
-                query.setParameter("keyword", searchValue);
+                query.setParameter("keyword", searchValue + "*");
             }
 
             Query queryToGetProductsQuantity = entityManager.createNativeQuery(queryToGetProductsQuantityString);
             queryToGetProductsQuantity.setParameter("categories", categories);
             if (!searchValue.isEmpty()) {
-                query.setParameter("keyword", searchValue);
+                queryToGetProductsQuantity.setParameter("keyword", searchValue + "*");
             }
 
             filteredProducts.setProducts(query.getResultList());

@@ -2,13 +2,16 @@ package com.ecommerce.ecommercewebsite.controller;
 
 import com.ecommerce.ecommercewebsite.entity.Opinion;
 import com.ecommerce.ecommercewebsite.exception.BadRequestException;
+import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
 import com.ecommerce.ecommercewebsite.service.OpinionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -29,7 +32,11 @@ public class OpinionController {
 
     @PostMapping("/add-opinion")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> insertOpinion(@RequestBody Opinion opinion) {
+    public ResponseEntity<?> insertOpinion(@Valid @RequestBody Opinion opinion, Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(errors.getFieldError().getDefaultMessage());
+        }
+
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
 

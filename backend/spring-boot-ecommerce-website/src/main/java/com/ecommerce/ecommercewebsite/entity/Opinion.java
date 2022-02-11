@@ -4,6 +4,8 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -26,6 +28,8 @@ public class Opinion {
     @Column(name = "user_id")
     private Long user_id;
 
+    @DecimalMin(value = "0.0")
+    @DecimalMax(value = "5.0")
     @Column(name = "rating")
     private BigDecimal rating;
 

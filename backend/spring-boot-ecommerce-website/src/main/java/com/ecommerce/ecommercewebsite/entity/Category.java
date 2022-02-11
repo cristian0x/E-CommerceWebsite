@@ -10,7 +10,6 @@ import java.util.Set;
 @Table(name = "categories")
 @Getter
 @Setter
-// @Data - known bug
 public class Category {
 
     @Id
@@ -20,7 +19,4 @@ public class Category {
 
     @Column(name = "name")
     private String name;
-
-    //@OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
-    //private Set<Product> products;
 }

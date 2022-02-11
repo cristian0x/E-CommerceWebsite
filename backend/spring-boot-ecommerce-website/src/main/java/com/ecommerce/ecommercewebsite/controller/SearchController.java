@@ -1,11 +1,15 @@
 package com.ecommerce.ecommercewebsite.controller;
 
 import com.ecommerce.ecommercewebsite.entity.Product;
+import com.ecommerce.ecommercewebsite.security.payload.response.MessageResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -17,7 +21,10 @@ public class SearchController {
     private EntityManager entityManager;
 
     @GetMapping("/search/{keyword}")
-    public List<Product> getSearchResult(@PathVariable String keyword) {
+    public ResponseEntity<?> getSearchResult(@Valid @PathVariable String keyword, Errors errors) {
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Something is wrong!"));
+        }
 
         List<Product> searchResult;
 
@@ -32,6 +39,6 @@ public class SearchController {
             throw e;
         }
 
-        return searchResult;
+        return ResponseEntity.ok(searchResult);
     }
 }
